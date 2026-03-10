@@ -1,0 +1,8 @@
+services:
+  mytimers:
+    build:
+      context: .
+    container_name: mytimers
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:80"

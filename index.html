@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyTimers</title>
+    <meta name="theme-color" content="#f5f5f7" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="MyTimers" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="widget-shell">
+      <header class="site-bar">
+        <div class="site-bar-inner">
+          <span class="brand">MyTimers</span>
+          <button type="button" id="settings-button" class="icon-button icon-only" aria-haspopup="dialog" aria-controls="settings-modal" aria-expanded="false" aria-label="Instellingen">
+            ⚙
+          </button>
+        </div>
+      </header>
+
+      <main class="app-shell">
+        <section class="panel timer-panel">
+          <div class="timer-overview">
+            <div class="overview-pill">
+              <span class="overview-label">Actief</span>
+              <strong id="active-step-label">Timer 1</strong>
+            </div>
+            <div class="overview-pill overview-pill-muted">
+              <span class="overview-label">Volgende</span>
+              <strong id="next-step-label">Geen</strong>
+            </div>
+            <div class="overview-pill overview-pill-muted overview-pill-wide">
+              <span class="overview-label">Reeks</span>
+              <strong id="sequence-label">1 / 1</strong>
+            </div>
+          </div>
+
+          <div id="timer-card" class="timer-card state-normal" aria-live="polite">
+            <div class="timer-face">
+              <div class="face-rings"></div>
+              <div class="markers" aria-hidden="true"></div>
+              <div id="progress-slice" class="progress-slice"></div>
+              <div class="pivot"></div>
+              <div class="center-readout">
+                <span id="timer-name" class="timer-name">Timer 1</span>
+                <strong id="large-time">05:00</strong>
+              </div>
+            </div>
+          </div>
+          <div class="timer-actions">
+            <button type="button" id="inline-start-button" class="floating-action primary" aria-label="Start timer">▶</button>
+            <button type="button" id="inline-pause-button" class="floating-action" aria-label="Pauzeer timer">❚❚</button>
+          </div>
+          <dl class="status-grid">
+            <div>
+              <dt>Status</dt>
+              <dd id="status-text" class="status-value">Gereed</dd>
+            </div>
+            <div>
+              <dt>Resterend</dt>
+              <dd id="digital-time" class="time-value">05:00</dd>
+            </div>
+          </dl>
+        </section>
+      </main>
+    </div>
+
+    <div id="settings-modal" class="modal" hidden>
+      <div class="modal-backdrop" id="modal-backdrop"></div>
+      <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Instellingen</p>
+            <h1 id="settings-title">Timerreeks</h1>
+          </div>
+          <button type="button" id="close-settings-button" class="icon-button close-button" aria-label="Sluit instellingen">
+            Sluit
+          </button>
+        </div>
+
+        <form id="timer-form" class="timer-form">
+          <div id="timer-list" class="timer-list"></div>
+
+          <div class="button-row button-row-compact">
+            <button type="button" id="add-timer-button">+ Timer</button>
+            <button type="button" id="save-button">Opslaan</button>
+          </div>
+
+          <div class="button-row">
+            <button type="submit" class="primary">Start</button>
+            <button type="button" id="pause-button">Pauze</button>
+            <button type="button" id="reset-button">Reset</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <template id="timer-item-template">
+      <article class="timer-item">
+        <div class="timer-item-head">
+          <p class="timer-item-index"></p>
+          <button type="button" class="remove-timer-button">Verwijder</button>
+        </div>
+
+        <label class="field">
+          <span>Naam</span>
+          <input class="timer-name-input" type="text" maxlength="40" placeholder="Bijv. Focus" required />
+        </label>
+
+        <label class="field">
+          <span>Type</span>
+          <select class="timer-mode-select">
+            <option value="duration">Duur</option>
+            <option value="endTime">Eindtijd</option>
+          </select>
+        </label>
+
+        <div class="inline-fields">
+          <label class="field duration-field">
+            <span>Min</span>
+            <input class="timer-minutes-input" type="number" min="0" max="999" value="5" required />
+          </label>
+
+          <label class="field duration-field">
+            <span>Sec</span>
+            <input class="timer-seconds-input" type="number" min="0" max="59" value="0" required />
+          </label>
+
+          <label class="field endtime-field" hidden>
+            <span>Eindtijd</span>
+            <input class="timer-endtime-input" type="time" step="60" />
+          </label>
+        </div>
+
+        <label class="toggle-field">
+          <input class="timer-autostart-input" type="checkbox" checked />
+          <span>Start volgende timer automatisch</span>
+        </label>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
