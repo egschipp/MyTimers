@@ -14,61 +14,63 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="widget-shell">
-      <header class="site-bar">
-        <div class="site-bar-inner">
-          <span class="brand">MyTimers</span>
-          <button type="button" id="settings-button" class="icon-button icon-only" aria-haspopup="dialog" aria-controls="settings-modal" aria-expanded="false" aria-label="Instellingen">
-            ⚙
-          </button>
-        </div>
-      </header>
-
-      <main class="app-shell">
-        <section class="panel timer-panel">
-          <div class="timer-overview">
-            <div class="overview-pill">
-              <span class="overview-label">Actief</span>
-              <strong id="active-step-label">Timer 1</strong>
-            </div>
-            <div class="overview-pill overview-pill-muted">
-              <span class="overview-label">Volgende</span>
-              <strong id="next-step-label">Geen</strong>
-            </div>
-            <div class="overview-pill overview-pill-muted overview-pill-wide">
-              <span class="overview-label">Reeks</span>
-              <strong id="sequence-label">1 / 1</strong>
-            </div>
+    <div class="widget-stage">
+      <div class="widget-shell">
+        <header class="site-bar">
+          <div class="site-bar-inner">
+            <span class="brand">MyTimers</span>
+            <button type="button" id="settings-button" class="icon-button icon-only" aria-haspopup="dialog" aria-controls="settings-modal" aria-expanded="false" aria-label="Instellingen">
+              ⚙
+            </button>
           </div>
+        </header>
 
-          <div id="timer-card" class="timer-card state-normal" aria-live="polite">
-            <div class="timer-face">
-              <div class="face-rings"></div>
-              <div class="markers" aria-hidden="true"></div>
-              <div id="progress-slice" class="progress-slice"></div>
-              <div class="pivot"></div>
-              <div class="center-readout">
-                <span id="timer-name" class="timer-name">Timer 1</span>
-                <strong id="large-time">05:00</strong>
+        <main class="app-shell">
+          <section class="panel timer-panel">
+            <div class="timer-overview">
+              <div class="overview-pill">
+                <span class="overview-label">Actief</span>
+                <strong id="active-step-label">Timer 1</strong>
+              </div>
+              <div class="overview-pill overview-pill-muted">
+                <span class="overview-label">Volgende</span>
+                <strong id="next-step-label">Geen</strong>
+              </div>
+              <div class="overview-pill overview-pill-muted overview-pill-wide">
+                <span class="overview-label">Reeks</span>
+                <strong id="sequence-label">1 / 1</strong>
               </div>
             </div>
-          </div>
-          <div class="timer-actions">
-            <button type="button" id="inline-start-button" class="floating-action primary" aria-label="Start timer">▶</button>
-            <button type="button" id="inline-pause-button" class="floating-action" aria-label="Pauzeer timer">❚❚</button>
-          </div>
-          <dl class="status-grid">
-            <div>
-              <dt>Status</dt>
-              <dd id="status-text" class="status-value">Gereed</dd>
+
+            <div id="timer-card" class="timer-card state-normal" aria-live="polite">
+              <div class="timer-face">
+                <div class="face-rings"></div>
+                <div class="markers" aria-hidden="true"></div>
+                <div id="progress-slice" class="progress-slice"></div>
+                <div class="pivot"></div>
+                <div class="center-readout">
+                  <span id="timer-name" class="timer-name">Timer 1</span>
+                  <strong id="large-time">05:00</strong>
+                </div>
+              </div>
             </div>
-            <div>
-              <dt>Resterend</dt>
-              <dd id="digital-time" class="time-value">05:00</dd>
+            <div class="timer-actions">
+              <button type="button" id="inline-start-button" class="floating-action primary" aria-label="Start timer">▶</button>
+              <button type="button" id="inline-pause-button" class="floating-action" aria-label="Pauzeer timer">❚❚</button>
             </div>
-          </dl>
-        </section>
-      </main>
+            <dl class="status-grid">
+              <div>
+                <dt>Status</dt>
+                <dd id="status-text" class="status-value">Gereed</dd>
+              </div>
+              <div>
+                <dt>Resterend</dt>
+                <dd id="digital-time" class="time-value">05:00</dd>
+              </div>
+            </dl>
+          </section>
+        </main>
+      </div>
     </div>
 
     <div id="settings-modal" class="modal" hidden>

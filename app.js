@@ -20,6 +20,7 @@ const nextStepLabel = document.getElementById("next-step-label");
 const sequenceLabel = document.getElementById("sequence-label");
 const timerCard = document.getElementById("timer-card");
 const progressSlice = document.getElementById("progress-slice");
+const widgetShell = document.querySelector(".widget-shell");
 
 const DEFAULT_STEPS = [
   {
@@ -90,6 +91,21 @@ function setState(state) {
 function setModalOpen(nextOpen) {
   settingsModal.hidden = !nextOpen;
   settingsButton.setAttribute("aria-expanded", String(nextOpen));
+}
+
+function syncWidgetScale() {
+  document.documentElement.style.setProperty("--app-scale", "1");
+
+  requestAnimationFrame(() => {
+    const viewportWidth = Math.max(140, window.innerWidth - 24);
+    const viewportHeight = Math.max(180, window.innerHeight - 24);
+    const shellWidth = widgetShell.offsetWidth;
+    const shellHeight = widgetShell.offsetHeight;
+    const scale = Math.min(1, viewportWidth / shellWidth, viewportHeight / shellHeight);
+
+    document.documentElement.style.setProperty("--widget-height", `${shellHeight}px`);
+    document.documentElement.style.setProperty("--app-scale", scale.toFixed(4));
+  });
 }
 
 function stopTimer() {
@@ -240,6 +256,8 @@ function render() {
   } else {
     setState("state-normal");
   }
+
+  syncWidgetScale();
 }
 
 function startCurrentStep() {
@@ -480,6 +498,8 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+window.addEventListener("resize", syncWidgetScale);
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./sw.js").catch(() => {});
@@ -489,3 +509,4 @@ if ("serviceWorker" in navigator) {
 renderList();
 resetSequence();
 setModalOpen(false);
+syncWidgetScale();
