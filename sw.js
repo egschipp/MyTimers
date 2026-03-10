@@ -1,4 +1,4 @@
-const CACHE_NAME = "mytimers-v2";
+const CACHE_NAME = "mytimers-v3";
 const APP_ASSETS = [
   "./",
   "./index.html",

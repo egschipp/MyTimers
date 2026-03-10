@@ -10,15 +10,16 @@
   --alert: #ff453a;
   --done: #a1a1a6;
   --shadow: 0 20px 44px rgba(13, 23, 36, 0.08);
-  --widget-width: 210px;
-  --widget-height: 332px;
-  --app-scale: 1;
+  --widget-width-base: 210px;
+  --widget-height-base: 332px;
+  --widget-scale: 1;
+  --widget-width: calc(var(--widget-width-base) * var(--widget-scale));
   --space-1: clamp(8px, 1.2vw, 10px);
   --space-2: clamp(10px, 1.4vw, 14px);
   --space-3: clamp(12px, 1.8vw, 16px);
   --radius-lg: clamp(18px, 2.4vw, 22px);
   --radius-md: clamp(12px, 1.8vw, 16px);
-  --timer-size: min(calc(var(--widget-width) - (var(--space-3) * 2)), 22vh, 150px);
+  --timer-size: min(calc(var(--widget-width) - (var(--space-3) * 2)), 150px);
   --font-xs: clamp(0.58rem, calc(var(--widget-width) / 360), 0.72rem);
   --font-sm: clamp(0.68rem, calc(var(--widget-width) / 290), 0.82rem);
   --font-md: clamp(0.82rem, calc(var(--widget-width) / 210), 1rem);
@@ -57,19 +58,12 @@ select {
   font: inherit;
 }
 
-.widget-stage {
-  width: calc(var(--widget-width) * var(--app-scale));
-  height: calc(var(--widget-height) * var(--app-scale));
-  margin-left: auto;
-  flex: 0 0 auto;
-}
-
 .widget-shell {
   width: var(--widget-width);
+  max-width: 100%;
+  margin-left: auto;
   display: grid;
   gap: var(--space-2);
-  transform: scale(var(--app-scale));
-  transform-origin: top right;
 }
 
 .site-bar-inner {

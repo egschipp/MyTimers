@@ -20,7 +20,6 @@ const nextStepLabel = document.getElementById("next-step-label");
 const sequenceLabel = document.getElementById("sequence-label");
 const timerCard = document.getElementById("timer-card");
 const progressSlice = document.getElementById("progress-slice");
-const widgetShell = document.querySelector(".widget-shell");
 
 const DEFAULT_STEPS = [
   {
@@ -94,17 +93,17 @@ function setModalOpen(nextOpen) {
 }
 
 function syncWidgetScale() {
-  document.documentElement.style.setProperty("--app-scale", "1");
+  document.documentElement.style.setProperty("--widget-scale", "1");
 
   requestAnimationFrame(() => {
+    const rootStyle = getComputedStyle(document.documentElement);
+    const baseWidth = parseFloat(rootStyle.getPropertyValue("--widget-width-base")) || 210;
+    const baseHeight = parseFloat(rootStyle.getPropertyValue("--widget-height-base")) || 332;
     const viewportWidth = Math.max(140, window.innerWidth - 24);
     const viewportHeight = Math.max(180, window.innerHeight - 24);
-    const shellWidth = widgetShell.offsetWidth;
-    const shellHeight = widgetShell.offsetHeight;
-    const scale = Math.min(1, viewportWidth / shellWidth, viewportHeight / shellHeight);
+    const scale = Math.min(1, viewportWidth / baseWidth, viewportHeight / baseHeight);
 
-    document.documentElement.style.setProperty("--widget-height", `${shellHeight}px`);
-    document.documentElement.style.setProperty("--app-scale", scale.toFixed(4));
+    document.documentElement.style.setProperty("--widget-scale", scale.toFixed(4));
   });
 }
 
