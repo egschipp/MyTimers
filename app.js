@@ -92,21 +92,6 @@ function setModalOpen(nextOpen) {
   settingsButton.setAttribute("aria-expanded", String(nextOpen));
 }
 
-function syncWidgetScale() {
-  document.documentElement.style.setProperty("--widget-scale", "1");
-
-  requestAnimationFrame(() => {
-    const rootStyle = getComputedStyle(document.documentElement);
-    const baseWidth = parseFloat(rootStyle.getPropertyValue("--widget-width-base")) || 210;
-    const baseHeight = parseFloat(rootStyle.getPropertyValue("--widget-height-base")) || 332;
-    const viewportWidth = Math.max(140, window.innerWidth - 24);
-    const viewportHeight = Math.max(180, window.innerHeight - 24);
-    const scale = Math.min(1, viewportWidth / baseWidth, viewportHeight / baseHeight);
-
-    document.documentElement.style.setProperty("--widget-scale", scale.toFixed(4));
-  });
-}
-
 function stopTimer() {
   running = false;
   if (rafId) {
@@ -255,8 +240,6 @@ function render() {
   } else {
     setState("state-normal");
   }
-
-  syncWidgetScale();
 }
 
 function startCurrentStep() {
@@ -497,8 +480,6 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-window.addEventListener("resize", syncWidgetScale);
-
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./sw.js").catch(() => {});
@@ -508,4 +489,3 @@ if ("serviceWorker" in navigator) {
 renderList();
 resetSequence();
 setModalOpen(false);
-syncWidgetScale();

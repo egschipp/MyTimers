@@ -41,22 +41,26 @@
             </div>
           </div>
 
-          <div id="timer-card" class="timer-card state-normal" aria-live="polite">
-            <div class="timer-face">
-              <div class="face-rings"></div>
-              <div class="markers" aria-hidden="true"></div>
-              <div id="progress-slice" class="progress-slice"></div>
-              <div class="pivot"></div>
-              <div class="center-readout">
-                <span id="timer-name" class="timer-name">Timer 1</span>
-                <strong id="large-time">05:00</strong>
+          <div class="timer-stage">
+            <div id="timer-card" class="timer-card state-normal" aria-live="polite">
+              <div class="timer-face">
+                <div class="face-rings"></div>
+                <div class="markers" aria-hidden="true"></div>
+                <div id="progress-slice" class="progress-slice"></div>
+                <div class="pivot"></div>
+                <div class="center-readout">
+                  <span id="timer-name" class="timer-name">Timer 1</span>
+                  <strong id="large-time">05:00</strong>
+                </div>
               </div>
             </div>
+
+            <div class="timer-actions">
+              <button type="button" id="inline-start-button" class="floating-action primary" aria-label="Start timer">▶</button>
+              <button type="button" id="inline-pause-button" class="floating-action" aria-label="Pauzeer timer">❚❚</button>
+            </div>
           </div>
-          <div class="timer-actions">
-            <button type="button" id="inline-start-button" class="floating-action primary" aria-label="Start timer">▶</button>
-            <button type="button" id="inline-pause-button" class="floating-action" aria-label="Pauzeer timer">❚❚</button>
-          </div>
+
           <dl class="status-grid">
             <div>
               <dt>Status</dt>
