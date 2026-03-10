@@ -6,7 +6,8 @@
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "any",
   "background_color": "#f5f5f7",
   "theme_color": "#f5f5f7",
   "icons": [
