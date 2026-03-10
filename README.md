@@ -17,6 +17,7 @@ docker compose up -d --build
 ```
 
 De container luistert dan lokaal op `127.0.0.1:8081`.
+De huidige Pi-deploy gebruikt `127.0.0.1:8082`.
 
 ## Caddy op Raspberry Pi
 
@@ -25,7 +26,7 @@ Gebruik in Caddy een siteblok zoals:
 ```caddy
 mytimers.schippers-online.nl {
     encode zstd gzip
-    reverse_proxy 127.0.0.1:8081
+    reverse_proxy 127.0.0.1:8082
 }
 ```
 
