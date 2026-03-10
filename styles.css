@@ -51,6 +51,7 @@ select {
 
 .widget-shell {
   width: var(--widget-width);
+  max-width: 100%;
   display: grid;
   gap: var(--space-2);
 }
@@ -87,6 +88,7 @@ select {
   border: 1px solid var(--panel-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
+  min-width: 0;
 }
 
 .eyebrow {
@@ -115,6 +117,7 @@ h1 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+  min-width: 0;
 }
 
 .overview-pill {
@@ -134,6 +137,7 @@ h1 {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .overview-pill-muted {
@@ -302,6 +306,7 @@ button.primary {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin: 0;
+  width: 100%;
 }
 
 .status-grid div {
@@ -348,6 +353,7 @@ dd {
   display: grid;
   place-items: center;
   gap: 8px;
+  width: 100%;
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.92), transparent 42%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.4));
@@ -355,6 +361,7 @@ dd {
 
 .timer-card {
   width: 100%;
+  min-width: 0;
   aspect-ratio: 1;
   display: grid;
   place-items: center;
@@ -394,6 +401,7 @@ dd {
 .timer-face {
   position: relative;
   width: var(--timer-size);
+  max-width: 100%;
   aspect-ratio: 1;
   border-radius: 50%;
   display: grid;
@@ -587,6 +595,7 @@ dd {
 @media (max-width: 520px) {
   body {
     justify-content: stretch;
+    padding: 8px;
   }
 
   .widget-shell {
@@ -616,6 +625,76 @@ dd {
   }
 }
 
+@media (max-width: 260px) {
+  :root {
+    --widget-width: calc(100vw - 12px);
+    --space-2: 8px;
+    --space-3: 10px;
+    --timer-size: min(calc(100vw - 44px), 30vh, 118px);
+    --font-xs: 0.56rem;
+    --font-sm: 0.64rem;
+    --font-md: 0.74rem;
+    --font-lg: 0.96rem;
+    --font-xl: 1.02rem;
+  }
+
+  body {
+    padding: 6px;
+  }
+
+  .site-bar-inner,
+  .timer-panel,
+  .status-grid div,
+  .overview-pill,
+  .timer-item,
+  .modal-panel {
+    border-radius: 14px;
+  }
+
+  .timer-overview,
+  .status-grid,
+  .inline-fields,
+  .button-row,
+  .button-row-compact {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-pill-wide {
+    grid-column: auto;
+  }
+
+  .timer-panel {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .timer-card {
+    aspect-ratio: auto;
+    min-height: calc(var(--timer-size) + 18px);
+    padding: 8px 0;
+  }
+
+  .timer-actions {
+    max-width: 40px;
+    gap: 3px;
+  }
+
+  .floating-action {
+    min-height: 10px;
+    max-width: 14px;
+    font-size: 0.38rem;
+  }
+
+  .status-grid div,
+  .overview-pill {
+    padding: 8px;
+  }
+
+  .center-readout {
+    gap: 2px;
+  }
+}
+
 @media (max-height: 760px) {
   :root {
     --widget-width: min(100vw - 18px, 190px);
@@ -635,5 +714,20 @@ dd {
 
   .site-bar-inner {
     padding: 6px 8px;
+  }
+}
+
+@media (max-height: 520px) {
+  :root {
+    --timer-size: min(calc(var(--widget-width) - 34px), 22vh, 104px);
+  }
+
+  .timer-overview,
+  .status-grid {
+    gap: 6px;
+  }
+
+  .timer-panel {
+    padding: 8px;
   }
 }
