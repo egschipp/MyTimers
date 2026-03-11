@@ -18,25 +18,21 @@
       <div class="widget-shell">
         <main class="widget-main">
           <section class="panel timer-panel">
-            <div class="overview-compact">
-              <div class="overview-row">
-                <span class="overview-label">Actief</span>
-                <strong id="active-step-label">Timer 1</strong>
-              </div>
-              <div class="overview-row">
-                <span class="overview-label">Volgende</span>
-                <strong id="next-step-label">Geen</strong>
-              </div>
-              <div class="sequence-chip">
-                <span class="overview-label">Reeks</span>
-                <strong id="sequence-label">1 / 1</strong>
-              </div>
-            </div>
-
             <div class="timer-stage">
               <button type="button" id="settings-button" class="icon-button icon-only timer-settings-button" aria-haspopup="dialog" aria-controls="settings-modal" aria-expanded="false" aria-label="Instellingen">
                 ⚙
               </button>
+
+              <div class="timer-meta timer-meta-top">
+                <div class="meta-chip">
+                  <span class="overview-label">Actief</span>
+                  <strong id="active-step-label">Timer 1</strong>
+                </div>
+                <div class="meta-chip">
+                  <span class="overview-label">Volgende</span>
+                  <strong id="next-step-label">Geen</strong>
+                </div>
+              </div>
 
               <div id="timer-card" class="timer-card state-normal" aria-live="polite">
                 <div class="timer-face">
@@ -52,6 +48,13 @@
                 </div>
               </div>
 
+              <div class="timer-meta timer-meta-bottom">
+                <div class="meta-chip meta-chip-wide">
+                  <span class="overview-label">Reeks</span>
+                  <strong id="sequence-label">1 / 1</strong>
+                </div>
+              </div>
+
               <div class="timer-actions">
                 <button type="button" id="inline-start-button" class="floating-action primary" aria-label="Start timer">▶</button>
                 <button type="button" id="inline-pause-button" class="floating-action" aria-label="Pauzeer timer">❚❚</button>
@@ -59,7 +62,7 @@
             </div>
 
             <div class="status-strip" aria-live="polite">
-              <span id="status-text" class="status-icon status-value">Gereed</span>
+              <span id="status-text" class="status-icon" aria-label="Gereed" title="Gereed"></span>
             </div>
 
             <span id="digital-time" class="time-value sr-only">05:00</span>

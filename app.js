@@ -207,6 +207,7 @@ function render() {
   const progressRatio = totalDurationMs === 0 ? 0 : safeRemaining / totalDurationMs;
   const activeStep = timerSteps[currentStepIndex];
   const nextStep = timerSteps[currentStepIndex + 1];
+  let statusLabel = "Gereed";
 
   digitalTime.textContent = timeLabel;
   largeTime.textContent = timeLabel;
@@ -217,21 +218,26 @@ function render() {
   progressSlice.style.background = `conic-gradient(from -90deg, var(--ring-color) 0deg ${progressRatio * 360}deg, transparent ${progressRatio * 360}deg 360deg)`;
 
   if (safeRemaining === 0 && !running && !waitingForManualStart && hasStarted) {
-    statusText.textContent = "Klaar";
+    statusLabel = "Klaar";
+    statusText.setAttribute("aria-label", statusLabel);
+    statusText.title = statusLabel;
     setState("state-done");
     return;
   }
 
   if (waitingForManualStart) {
     const nextStep = timerSteps[currentStepIndex];
-    statusText.textContent = nextStep ? `Start klaar: ${nextStep.name}` : "Wacht op start";
+    statusLabel = nextStep ? `Start klaar: ${nextStep.name}` : "Wacht op start";
   } else if (!hasStarted) {
-    statusText.textContent = "Gereed";
+    statusLabel = "Gereed";
   } else if (!running) {
-    statusText.textContent = "Gepauzeerd";
+    statusLabel = "Gepauzeerd";
   } else {
-    statusText.textContent = "Loopt";
+    statusLabel = "Loopt";
   }
+
+  statusText.setAttribute("aria-label", statusLabel);
+  statusText.title = statusLabel;
 
   if (progressRatio <= 0.05) {
     setState("state-alert");
