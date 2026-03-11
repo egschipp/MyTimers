@@ -115,6 +115,10 @@ function setStatusIndicator({ state, icon, label }) {
 }
 
 function clearFormFeedback() {
+  if (!formFeedback || !timerList) {
+    return;
+  }
+
   formFeedback.hidden = true;
   formFeedback.textContent = "";
   timerList.querySelectorAll(".timer-item").forEach((item) => {
@@ -128,6 +132,10 @@ function clearFormFeedback() {
 }
 
 function showFormError(message, index = null) {
+  if (!formFeedback || !timerList) {
+    return;
+  }
+
   formFeedback.hidden = false;
   formFeedback.textContent = message;
 
@@ -157,6 +165,10 @@ function showStatusError(message = "Controleer je timerinstellingen") {
 }
 
 function setModalOpen(nextOpen) {
+  if (!settingsModal || !settingsButton) {
+    return;
+  }
+
   settingsModal.hidden = !nextOpen;
   settingsButton.setAttribute("aria-expanded", String(nextOpen));
 
@@ -193,6 +205,10 @@ function loadStep(index, resetStarted = false) {
 }
 
 function getFocusableModalElements() {
+  if (!settingsModal) {
+    return [];
+  }
+
   return [...settingsModal.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled])')];
 }
 
@@ -210,6 +226,10 @@ function syncItemModeVisibility(item) {
 }
 
 function renderList() {
+  if (!timerList || !timerItemTemplate) {
+    return;
+  }
+
   timerList.innerHTML = "";
 
   timerSteps.forEach((step, index) => {
@@ -249,6 +269,10 @@ function renderList() {
 }
 
 function readStepsFromForm() {
+  if (!timerList) {
+    return structuredClone(timerSteps);
+  }
+
   clearFormFeedback();
   const items = [...timerList.querySelectorAll(".timer-item")];
   const steps = items.map((item, index) => {
@@ -291,6 +315,10 @@ function applyStepsFromForm() {
 }
 
 function render() {
+  if (!digitalTime || !largeTime || !timerName || !activeStepLabel || !nextStepLabel || !sequenceLabel || !progressSlice || !timerCard || !statusText) {
+    return;
+  }
+
   const safeRemaining = Math.max(0, remainingMs);
   const timeLabel = formatTime(safeRemaining);
   const progressRatio = totalDurationMs === 0 ? 0 : safeRemaining / totalDurationMs;
@@ -455,33 +483,37 @@ function handlePauseAction() {
   }
 }
 
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
+if (form) {
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
 
-  try {
-    applyStepsFromForm();
-  } catch (error) {
-    showStatusError(error.message);
-    return;
-  }
+    try {
+      applyStepsFromForm();
+    } catch (error) {
+      showStatusError(error.message);
+      return;
+    }
 
-  loadStep(waitingForManualStart ? currentStepIndex : 0);
+    loadStep(waitingForManualStart ? currentStepIndex : 0);
 
-  setModalOpen(false);
-  renderList();
-  startCurrentStep();
-});
-
-saveButton.addEventListener("click", () => {
-  try {
-    applyStepsFromForm();
-    renderList();
-    resetSequence();
     setModalOpen(false);
-  } catch (error) {
-    showStatusError(error.message);
-  }
-});
+    renderList();
+    startCurrentStep();
+  });
+}
+
+if (saveButton) {
+  saveButton.addEventListener("click", () => {
+    try {
+      applyStepsFromForm();
+      renderList();
+      resetSequence();
+      setModalOpen(false);
+    } catch (error) {
+      showStatusError(error.message);
+    }
+  });
+}
 
 if (inlineStartButton) {
   inlineStartButton.addEventListener("click", () => {
@@ -512,80 +544,92 @@ if (inlineResetButton) {
   });
 }
 
-addTimerButton.addEventListener("click", () => {
-  try {
-    timerSteps = readStepsFromForm();
-  } catch {
-    timerSteps = timerSteps.length ? timerSteps : structuredClone(DEFAULT_STEPS);
-  }
+if (addTimerButton) {
+  addTimerButton.addEventListener("click", () => {
+    try {
+      timerSteps = readStepsFromForm();
+    } catch {
+      timerSteps = timerSteps.length ? timerSteps : structuredClone(DEFAULT_STEPS);
+    }
 
-  addStep();
-});
+    addStep();
+  });
+}
 
-timerList.addEventListener("click", (event) => {
-  const removeButton = event.target.closest(".remove-timer-button");
+if (timerList) {
+  timerList.addEventListener("click", (event) => {
+    const removeButton = event.target.closest(".remove-timer-button");
 
-  if (!removeButton) {
-    return;
-  }
+    if (!removeButton) {
+      return;
+    }
 
-  const item = removeButton.closest(".timer-item");
-  const itemIndex = Number(item.dataset.index);
+    const item = removeButton.closest(".timer-item");
+    const itemIndex = Number(item.dataset.index);
 
-  if (timerSteps.length <= 1) {
-    return;
-  }
+    if (timerSteps.length <= 1) {
+      return;
+    }
 
-  try {
-    timerSteps = readStepsFromForm();
-  } catch {
-    timerSteps = timerSteps.length ? timerSteps : structuredClone(DEFAULT_STEPS);
-  }
+    try {
+      timerSteps = readStepsFromForm();
+    } catch {
+      timerSteps = timerSteps.length ? timerSteps : structuredClone(DEFAULT_STEPS);
+    }
 
-  timerSteps.splice(itemIndex, 1);
-  currentStepIndex = Math.min(currentStepIndex, timerSteps.length - 1);
-  renderList();
-});
+    timerSteps.splice(itemIndex, 1);
+    currentStepIndex = Math.min(currentStepIndex, timerSteps.length - 1);
+    renderList();
+  });
 
-timerList.addEventListener("change", (event) => {
-  const modeSelect = event.target.closest(".timer-mode-select");
+  timerList.addEventListener("change", (event) => {
+    const modeSelect = event.target.closest(".timer-mode-select");
 
-  if (!modeSelect) {
-    return;
-  }
+    if (!modeSelect) {
+      return;
+    }
 
-  syncItemModeVisibility(modeSelect.closest(".timer-item"));
-});
+    syncItemModeVisibility(modeSelect.closest(".timer-item"));
+  });
 
-timerList.addEventListener("input", () => {
-  clearFormFeedback();
-});
+  timerList.addEventListener("input", () => {
+    clearFormFeedback();
+  });
+}
 
-settingsButton.addEventListener("click", () => {
-  renderList();
-  setModalOpen(true);
-});
+if (settingsButton) {
+  settingsButton.addEventListener("click", () => {
+    renderList();
+    setModalOpen(true);
+  });
+}
 
-editSequenceButton.addEventListener("click", () => {
-  renderList();
-  setModalOpen(true);
-});
+if (editSequenceButton) {
+  editSequenceButton.addEventListener("click", () => {
+    renderList();
+    setModalOpen(true);
+  });
+}
 
-closeSettingsButton.addEventListener("click", () => {
-  setModalOpen(false);
-});
+if (closeSettingsButton) {
+  closeSettingsButton.addEventListener("click", () => {
+    setModalOpen(false);
+  });
+}
 
-modalBackdrop.addEventListener("click", () => {
-  setModalOpen(false);
-});
+if (modalBackdrop) {
+  modalBackdrop.addEventListener("click", () => {
+    setModalOpen(false);
+  });
+}
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !settingsModal.hidden) {
+  if (settingsModal && event.key === "Escape" && !settingsModal.hidden) {
     setModalOpen(false);
     return;
   }
 
-  if (event.key === "Tab" && !settingsModal.hidden) {
+  if (settingsModal && event.key === "Tab" && !settingsModal.hidden) {
     const focusable = getFocusableModalElements();
     if (!focusable.length) {
       return;
