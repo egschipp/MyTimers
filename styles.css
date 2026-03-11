@@ -16,18 +16,18 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --viewport-min: min(100dvw, 100dvh);
-  --widget-width: clamp(440px, calc(var(--viewport-min) * 0.96), 720px);
+  --widget-width: clamp(360px, calc(var(--viewport-min) * 0.9), 540px);
   --space-1: clamp(5px, calc(var(--widget-width) * 0.025), 8px);
   --space-2: clamp(7px, calc(var(--widget-width) * 0.038), 10px);
   --space-3: clamp(8px, calc(var(--widget-width) * 0.05), 12px);
   --radius-lg: clamp(14px, calc(var(--widget-width) * 0.08), 18px);
   --radius-md: clamp(10px, calc(var(--widget-width) * 0.055), 14px);
   --timer-size: calc(var(--widget-width) - (var(--space-2) * 2));
-  --font-xs: clamp(0.62rem, calc(var(--widget-width) / 330), 0.76rem);
-  --font-sm: clamp(0.76rem, calc(var(--widget-width) / 250), 0.94rem);
-  --font-md: clamp(0.92rem, calc(var(--widget-width) / 180), 1.1rem);
-  --font-lg: clamp(1.5rem, calc(var(--widget-width) / 88), 2.3rem);
-  --font-xl: clamp(1.05rem, calc(var(--widget-width) / 120), 1.4rem);
+  --font-xs: clamp(0.52rem, calc(var(--widget-width) / 500), 0.68rem);
+  --font-sm: clamp(0.68rem, calc(var(--widget-width) / 360), 0.82rem);
+  --font-md: clamp(0.88rem, calc(var(--widget-width) / 230), 1rem);
+  --font-lg: clamp(1.5rem, calc(var(--widget-width) / 120), 2rem);
+  --font-xl: clamp(0.98rem, calc(var(--widget-width) / 180), 1.16rem);
 }
 
 * {
@@ -278,21 +278,21 @@ dd {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
+  padding: 4px 9px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.76);
   border: 1px solid rgba(255, 255, 255, 0.84);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
     0 6px 14px rgba(13, 23, 36, 0.05);
-  font-size: var(--font-sm);
+  font-size: var(--font-xs);
   font-weight: 600;
 }
 
 .status-value::before {
   content: "";
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: var(--ring-color, var(--accent));
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring-color, var(--accent)) 16%, transparent);
@@ -333,19 +333,19 @@ dd {
 
 .timer-settings-button {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 12px;
+  right: 12px;
   z-index: 2;
 }
 
 .floating-action {
   padding: 0;
-  min-height: clamp(36px, calc(var(--widget-width) * 0.14), 48px);
+  min-height: clamp(34px, calc(var(--widget-width) * 0.105), 42px);
   aspect-ratio: 1;
-  width: clamp(36px, calc(var(--widget-width) * 0.14), 48px);
+  width: clamp(34px, calc(var(--widget-width) * 0.105), 42px);
   display: grid;
   place-items: center;
-  font-size: clamp(0.85rem, calc(var(--widget-width) / 260), 1.05rem);
+  font-size: clamp(0.74rem, calc(var(--widget-width) / 380), 0.92rem);
   line-height: 1;
   box-shadow: 0 3px 8px rgba(13, 23, 36, 0.08);
 }
@@ -398,7 +398,7 @@ dd {
 }
 
 .progress-slice {
-  inset: 12%;
+  inset: 10%;
   border-radius: 50%;
   background: conic-gradient(from -90deg, var(--ring-color, var(--accent)) 0deg 360deg, transparent 360deg);
   opacity: 0.34;
@@ -419,12 +419,18 @@ dd {
 
 .center-readout {
   display: grid;
-  gap: 2px;
+  gap: 1px;
   text-align: center;
-  padding: 0;
-  border: none;
-  background: transparent;
-  backdrop-filter: none;
+  padding: 12px 18px;
+  min-width: 34%;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.58));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 10px 22px rgba(13, 23, 36, 0.08);
+  backdrop-filter: blur(10px);
+  z-index: 2;
 }
 
 .timer-name {
@@ -449,54 +455,57 @@ dd {
 }
 
 .timer-hud-top {
-  top: 7%;
+  top: 8%;
   left: 50%;
   transform: translateX(-50%);
 }
 
 .timer-hud-meta {
   left: 50%;
-  bottom: 24%;
+  bottom: 18%;
   transform: translateX(-50%);
-  width: 58%;
-  gap: 6px;
+  width: 72%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .circle-meta {
   width: 100%;
   display: grid;
-  gap: 1px;
+  gap: 3px;
   justify-items: center;
   text-align: center;
 }
 
 .circle-meta strong {
-  font-size: var(--font-sm);
-  line-height: 1;
+  font-size: var(--font-md);
+  line-height: 0.98;
   font-weight: 600;
+  letter-spacing: -0.03em;
 }
 
 .timer-hud-actions {
   left: 50%;
-  bottom: 9%;
+  bottom: 7%;
   transform: translateX(-50%);
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
 .icon-button {
   padding: 5px 8px;
-  min-height: 22px;
+  min-height: 28px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(241, 243, 247, 0.88));
 }
 
 .icon-only {
-  min-width: 22px;
-  width: 22px;
+  min-width: 28px;
+  width: 28px;
   padding: 0;
   display: grid;
   place-items: center;
-  font-size: var(--font-md);
+  font-size: var(--font-sm);
 }
 
 .remove-timer-button {
@@ -600,7 +609,7 @@ dd {
 
 @media (max-width: 360px), (max-height: 520px) {
   :root {
-    --widget-width: min(100%, clamp(300px, calc(var(--viewport-min) * 0.96), 420px));
+    --widget-width: min(100%, clamp(280px, calc(var(--viewport-min) * 0.94), 360px));
     --timer-size: calc(var(--widget-width) - (var(--space-2) * 2));
   }
 }
