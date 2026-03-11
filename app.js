@@ -85,7 +85,21 @@ function normalizeStep(step, index) {
 
 function setState(state) {
   timerCard.className = `timer-card ${state}`;
+}
+
+function setStatusIndicator({ label, state, icon }) {
   statusText.dataset.state = state;
+  statusText.dataset.icon = icon;
+  statusText.setAttribute("aria-label", label);
+  statusText.title = label;
+}
+
+function showStatusError(message) {
+  setStatusIndicator({
+    label: message,
+    state: "state-alert",
+    icon: "!"
+  });
 }
 
 function setModalOpen(nextOpen) {
@@ -220,32 +234,37 @@ function render() {
 
   if (safeRemaining === 0 && !running && !waitingForManualStart && hasStarted) {
     statusLabel = "Klaar";
-    statusText.setAttribute("aria-label", statusLabel);
-    statusText.title = statusLabel;
     setState("state-done");
+    setStatusIndicator({ label: statusLabel, state: "state-done", icon: "OK" });
     return;
   }
+
+  let statusIcon = "OK";
 
   if (waitingForManualStart) {
     const nextStep = timerSteps[currentStepIndex];
     statusLabel = nextStep ? `Start klaar: ${nextStep.name}` : "Wacht op start";
+    statusIcon = ">";
   } else if (!hasStarted) {
     statusLabel = "Gereed";
+    statusIcon = "OK";
   } else if (!running) {
     statusLabel = "Gepauzeerd";
+    statusIcon = "||";
   } else {
     statusLabel = "Loopt";
+    statusIcon = ">";
   }
-
-  statusText.setAttribute("aria-label", statusLabel);
-  statusText.title = statusLabel;
 
   if (progressRatio <= 0.05) {
     setState("state-alert");
+    setStatusIndicator({ label: statusLabel, state: "state-alert", icon: "!" });
   } else if (progressRatio <= 0.15) {
     setState("state-warning");
+    setStatusIndicator({ label: statusLabel, state: "state-warning", icon: "!" });
   } else {
     setState("state-normal");
+    setStatusIndicator({ label: statusLabel, state: "state-normal", icon: statusIcon });
   }
 }
 
@@ -303,7 +322,6 @@ function tick() {
 function resetSequence() {
   stopTimer();
   loadStep(0, true);
-  statusText.textContent = "Gereed";
   render();
 }
 
@@ -354,7 +372,7 @@ form.addEventListener("submit", (event) => {
   try {
     applyStepsFromForm();
   } catch (error) {
-    statusText.textContent = error.message;
+    showStatusError(error.message);
     return;
   }
 
@@ -372,7 +390,7 @@ saveButton.addEventListener("click", () => {
     resetSequence();
     setModalOpen(false);
   } catch (error) {
-    statusText.textContent = error.message;
+    showStatusError(error.message);
   }
 });
 
@@ -415,7 +433,7 @@ resetButton.addEventListener("click", () => {
   try {
     applyStepsFromForm();
   } catch (error) {
-    statusText.textContent = error.message;
+    showStatusError(error.message);
     return;
   }
 
