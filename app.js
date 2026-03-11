@@ -3,6 +3,8 @@ const saveButton = document.getElementById("save-button");
 const addTimerButton = document.getElementById("add-timer-button");
 const inlineStartButton = document.getElementById("inline-start-button");
 const inlineSecondaryButton = document.getElementById("inline-secondary-button");
+const inlinePauseButton = document.getElementById("inline-pause-button");
+const inlineResetButton = document.getElementById("inline-reset-button");
 const inlineStartLabel = document.getElementById("inline-start-label");
 const inlineSecondaryLabel = document.getElementById("inline-secondary-label");
 const inlineSecondaryIcon = document.getElementById("inline-secondary-icon");
@@ -22,6 +24,7 @@ const timerName = document.getElementById("timer-name");
 const activeStepLabel = document.getElementById("active-step-label");
 const nextStepLabel = document.getElementById("next-step-label");
 const sequenceLabel = document.getElementById("sequence-label");
+const nextActionLabel = document.getElementById("next-action-label");
 const timerCard = document.getElementById("timer-card");
 const progressSlice = document.getElementById("progress-slice");
 const formFeedback = document.getElementById("form-feedback");
@@ -91,15 +94,24 @@ function normalizeStep(step, index) {
 
 function setState(state) {
   timerCard.className = `timer-card ${state}`;
-  statusBadge.className = `status-badge ${state}`;
+  if (statusBadge) {
+    statusBadge.className = `status-badge ${state}`;
+  }
 }
 
 function setStatusIndicator({ state, icon, label }) {
   statusText.dataset.state = state;
   statusText.dataset.icon = icon;
-  statusLabel.textContent = label;
-  statusBadge.className = `status-badge ${state}`;
-  statusBadge.setAttribute("aria-label", label);
+  if (statusLabel) {
+    statusLabel.textContent = label;
+  }
+  if (statusBadge) {
+    statusBadge.className = `status-badge ${state}`;
+    statusBadge.setAttribute("aria-label", label);
+  }
+  if (nextActionLabel) {
+    nextActionLabel.textContent = label;
+  }
 }
 
 function clearFormFeedback() {
@@ -292,16 +304,26 @@ function render() {
   activeStepLabel.textContent = activeStep ? activeStep.name : "Timer";
   nextStepLabel.textContent = nextStep ? nextStep.name : "Geen";
   sequenceLabel.textContent = `${currentStepIndex + 1} / ${timerSteps.length}`;
-  inlineStartLabel.textContent = !hasStarted || safeRemaining === 0 || waitingForManualStart ? "Start" : "Hervat";
-  inlineSecondaryLabel.textContent = running ? "Pauze" : "Reset";
-  inlineSecondaryIcon.textContent = running ? "❚❚" : "↺";
+  if (inlineStartLabel) {
+    inlineStartLabel.textContent = !hasStarted || safeRemaining === 0 || waitingForManualStart ? "Start" : "Hervat";
+  }
+  if (inlineSecondaryLabel) {
+    inlineSecondaryLabel.textContent = running ? "Pauze" : "Reset";
+  }
+  if (inlineSecondaryIcon) {
+    inlineSecondaryIcon.textContent = running ? "❚❚" : "↺";
+  }
 
   if (safeRemaining === 0 && !running && !waitingForManualStart && hasStarted) {
     currentStatusLabel = "Klaar";
     setState("state-done");
     setStatusIndicator({ state: "state-done", icon: "OK", label: currentStatusLabel });
-    inlineSecondaryLabel.textContent = "Reset";
-    inlineSecondaryIcon.textContent = "↺";
+    if (inlineSecondaryLabel) {
+      inlineSecondaryLabel.textContent = "Reset";
+    }
+    if (inlineSecondaryIcon) {
+      inlineSecondaryIcon.textContent = "↺";
+    }
     return;
   }
 
@@ -461,18 +483,34 @@ saveButton.addEventListener("click", () => {
   }
 });
 
-inlineStartButton.addEventListener("click", () => {
-  handleStartAction();
-});
+if (inlineStartButton) {
+  inlineStartButton.addEventListener("click", () => {
+    handleStartAction();
+  });
+}
 
-inlineSecondaryButton.addEventListener("click", () => {
-  if (running) {
+if (inlineSecondaryButton) {
+  inlineSecondaryButton.addEventListener("click", () => {
+    if (running) {
+      handlePauseAction();
+      return;
+    }
+
+    resetSequence();
+  });
+}
+
+if (inlinePauseButton) {
+  inlinePauseButton.addEventListener("click", () => {
     handlePauseAction();
-    return;
-  }
+  });
+}
 
-  resetSequence();
-});
+if (inlineResetButton) {
+  inlineResetButton.addEventListener("click", () => {
+    resetSequence();
+  });
+}
 
 addTimerButton.addEventListener("click", () => {
   try {
