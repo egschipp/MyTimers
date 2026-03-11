@@ -22,17 +22,12 @@
               <button type="button" id="settings-button" class="icon-button icon-only timer-settings-button" aria-haspopup="dialog" aria-controls="settings-modal" aria-expanded="false" aria-label="Instellingen">
                 ⚙
               </button>
-              <span id="status-text" class="status-icon timer-status-indicator" data-icon="OK" aria-hidden="true"></span>
-
-              <div class="timer-meta timer-meta-top">
-                <div class="meta-chip">
-                  <span class="overview-label">Actief</span>
-                  <strong id="active-step-label">Timer 1</strong>
+              <div class="timer-header">
+                <div id="status-badge" class="status-badge state-normal" role="status" aria-live="polite">
+                  <span id="status-text" class="status-icon" data-icon="OK" aria-hidden="true"></span>
+                  <span id="status-label">Gereed</span>
                 </div>
-                <div class="meta-chip">
-                  <span class="overview-label">Volgende</span>
-                  <strong id="next-step-label">Geen</strong>
-                </div>
+                <button type="button" id="edit-sequence-button" class="text-button">Bewerk reeks</button>
               </div>
 
               <div id="timer-card" class="timer-card state-normal" aria-live="polite">
@@ -49,16 +44,41 @@
                 </div>
               </div>
 
-              <div class="timer-meta timer-meta-bottom">
-                <div class="meta-chip meta-chip-wide">
+              <div class="timer-summary">
+                <div class="summary-block summary-block-primary">
+                  <span class="overview-label">Actief</span>
+                  <strong id="active-step-label">Timer 1</strong>
+                </div>
+                <div class="summary-block">
+                  <span class="overview-label">Volgende</span>
+                  <strong id="next-step-label">Geen</strong>
+                </div>
+                <div class="summary-block">
                   <span class="overview-label">Reeks</span>
                   <strong id="sequence-label">1 / 1</strong>
                 </div>
               </div>
 
+              <div class="timer-meta timer-meta-bottom">
+                <div class="meta-chip meta-chip-wide">
+                  <span class="overview-label">Volgende actie</span>
+                  <strong id="next-action-label">Open instellingen om je reeks aan te passen</strong>
+                </div>
+              </div>
+
               <div class="timer-actions">
-                <button type="button" id="inline-start-button" class="floating-action primary" aria-label="Start timer">▶</button>
-                <button type="button" id="inline-pause-button" class="floating-action" aria-label="Pauzeer timer">❚❚</button>
+                <button type="button" id="inline-start-button" class="floating-action primary" aria-label="Start of hervat timer">
+                  <span class="action-icon" aria-hidden="true">▶</span>
+                  <span id="inline-start-label">Start</span>
+                </button>
+                <button type="button" id="inline-pause-button" class="floating-action" aria-label="Pauzeer timer">
+                  <span class="action-icon" aria-hidden="true">❚❚</span>
+                  <span>Pauze</span>
+                </button>
+                <button type="button" id="inline-reset-button" class="floating-action" aria-label="Reset timer">
+                  <span class="action-icon" aria-hidden="true">↺</span>
+                  <span>Reset</span>
+                </button>
               </div>
             </div>
 
@@ -82,6 +102,7 @@
         </div>
 
         <form id="timer-form" class="timer-form">
+          <p id="form-feedback" class="form-feedback" role="alert" hidden></p>
           <div id="timer-list" class="timer-list"></div>
 
           <div class="button-row button-row-compact">
@@ -89,10 +110,8 @@
             <button type="button" id="save-button">Opslaan</button>
           </div>
 
-          <div class="button-row">
-            <button type="submit" class="primary">Start</button>
-            <button type="button" id="pause-button">Pauze</button>
-            <button type="button" id="reset-button">Reset</button>
+          <div class="button-row button-row-single">
+            <button type="submit" class="primary">Start reeks</button>
           </div>
         </form>
       </section>
@@ -139,6 +158,8 @@
           <input class="timer-autostart-input" type="checkbox" checked />
           <span>Start volgende timer automatisch</span>
         </label>
+
+        <p class="timer-item-feedback" hidden></p>
       </article>
     </template>
 

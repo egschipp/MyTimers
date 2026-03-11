@@ -1,25 +1,30 @@
 const form = document.getElementById("timer-form");
-const pauseButton = document.getElementById("pause-button");
-const resetButton = document.getElementById("reset-button");
 const saveButton = document.getElementById("save-button");
 const addTimerButton = document.getElementById("add-timer-button");
 const inlineStartButton = document.getElementById("inline-start-button");
 const inlinePauseButton = document.getElementById("inline-pause-button");
+const inlineResetButton = document.getElementById("inline-reset-button");
+const inlineStartLabel = document.getElementById("inline-start-label");
 const timerList = document.getElementById("timer-list");
 const timerItemTemplate = document.getElementById("timer-item-template");
 const settingsButton = document.getElementById("settings-button");
+const editSequenceButton = document.getElementById("edit-sequence-button");
 const closeSettingsButton = document.getElementById("close-settings-button");
 const settingsModal = document.getElementById("settings-modal");
 const modalBackdrop = document.getElementById("modal-backdrop");
 const statusText = document.getElementById("status-text");
+const statusLabel = document.getElementById("status-label");
+const statusBadge = document.getElementById("status-badge");
 const digitalTime = document.getElementById("digital-time");
 const largeTime = document.getElementById("large-time");
 const timerName = document.getElementById("timer-name");
 const activeStepLabel = document.getElementById("active-step-label");
 const nextStepLabel = document.getElementById("next-step-label");
 const sequenceLabel = document.getElementById("sequence-label");
+const nextActionLabel = document.getElementById("next-action-label");
 const timerCard = document.getElementById("timer-card");
 const progressSlice = document.getElementById("progress-slice");
+const formFeedback = document.getElementById("form-feedback");
 
 const DEFAULT_STEPS = [
   {
@@ -41,6 +46,7 @@ let rafId = 0;
 let running = false;
 let hasStarted = false;
 let waitingForManualStart = false;
+let lastFocusedTrigger = null;
 
 function formatTime(totalMs) {
   const totalSeconds = Math.max(0, Math.ceil(totalMs / 1000));
@@ -85,23 +91,74 @@ function normalizeStep(step, index) {
 
 function setState(state) {
   timerCard.className = `timer-card ${state}`;
+  statusBadge.className = `status-badge ${state}`;
 }
 
-function setStatusIndicator({ state, icon }) {
+function setStatusIndicator({ state, icon, label }) {
   statusText.dataset.state = state;
   statusText.dataset.icon = icon;
+  statusLabel.textContent = label;
+  statusBadge.className = `status-badge ${state}`;
+  statusBadge.setAttribute("aria-label", label);
 }
 
-function showStatusError() {
+function clearFormFeedback() {
+  formFeedback.hidden = true;
+  formFeedback.textContent = "";
+  timerList.querySelectorAll(".timer-item").forEach((item) => {
+    item.classList.remove("has-error");
+    const feedback = item.querySelector(".timer-item-feedback");
+    if (feedback) {
+      feedback.hidden = true;
+      feedback.textContent = "";
+    }
+  });
+}
+
+function showFormError(message, index = null) {
+  formFeedback.hidden = false;
+  formFeedback.textContent = message;
+
+  if (index === null) {
+    return;
+  }
+
+  const item = timerList.querySelector(`.timer-item[data-index="${index}"]`);
+  if (!item) {
+    return;
+  }
+
+  item.classList.add("has-error");
+  const feedback = item.querySelector(".timer-item-feedback");
+  if (feedback) {
+    feedback.hidden = false;
+    feedback.textContent = message;
+  }
+}
+
+function showStatusError(message = "Controleer je timerinstellingen") {
   setStatusIndicator({
     state: "state-alert",
-    icon: "!"
+    icon: "!",
+    label: message
   });
 }
 
 function setModalOpen(nextOpen) {
   settingsModal.hidden = !nextOpen;
   settingsButton.setAttribute("aria-expanded", String(nextOpen));
+
+  if (nextOpen) {
+    lastFocusedTrigger = document.activeElement;
+    requestAnimationFrame(() => {
+      const firstFocusable = settingsModal.querySelector("input, select, button");
+      firstFocusable?.focus();
+    });
+    return;
+  }
+
+  clearFormFeedback();
+  lastFocusedTrigger?.focus?.();
 }
 
 function stopTimer() {
@@ -121,6 +178,10 @@ function loadStep(index, resetStarted = false) {
   if (resetStarted) {
     hasStarted = false;
   }
+}
+
+function getFocusableModalElements() {
+  return [...settingsModal.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled])')];
 }
 
 function syncItemModeVisibility(item) {
@@ -176,6 +237,7 @@ function renderList() {
 }
 
 function readStepsFromForm() {
+  clearFormFeedback();
   const items = [...timerList.querySelectorAll(".timer-item")];
   const steps = items.map((item, index) => {
     const step = normalizeStep(
@@ -191,18 +253,21 @@ function readStepsFromForm() {
     );
 
     if (getStepDurationMs(step) <= 0) {
-      throw new Error(
+      const message =
         step.mode === "endTime"
           ? `Timer ${index + 1} heeft een geldige eindtijd nodig`
-          : `Timer ${index + 1} moet groter zijn dan 0 seconden`
-      );
+          : `Timer ${index + 1} moet groter zijn dan 0 seconden`;
+      showFormError(message, index);
+      throw new Error(message);
     }
 
     return step;
   });
 
   if (steps.length === 0) {
-    throw new Error("Voeg minimaal 1 timer toe");
+    const message = "Voeg minimaal 1 timer toe";
+    showFormError(message);
+    throw new Error(message);
   }
 
   steps[steps.length - 1].autoStartNext = false;
@@ -219,7 +284,8 @@ function render() {
   const progressRatio = totalDurationMs === 0 ? 0 : safeRemaining / totalDurationMs;
   const activeStep = timerSteps[currentStepIndex];
   const nextStep = timerSteps[currentStepIndex + 1];
-  let statusLabel = "Gereed";
+  let currentStatusLabel = "Gereed";
+  let nextActionText = "Open instellingen om je reeks aan te passen";
 
   digitalTime.textContent = timeLabel;
   largeTime.textContent = timeLabel;
@@ -227,12 +293,14 @@ function render() {
   activeStepLabel.textContent = activeStep ? activeStep.name : "Timer";
   nextStepLabel.textContent = nextStep ? nextStep.name : "Geen";
   sequenceLabel.textContent = `${currentStepIndex + 1} / ${timerSteps.length}`;
-  progressSlice.style.background = `conic-gradient(from -90deg, var(--ring-color) 0deg ${progressRatio * 360}deg, transparent ${progressRatio * 360}deg 360deg)`;
+  inlineStartLabel.textContent = !hasStarted || safeRemaining === 0 || waitingForManualStart ? "Start" : "Hervat";
 
   if (safeRemaining === 0 && !running && !waitingForManualStart && hasStarted) {
-    statusLabel = "Klaar";
+    currentStatusLabel = "Klaar";
+    nextActionText = nextStep ? `Volgende timer: ${nextStep.name}` : "Je reeks is afgerond";
     setState("state-done");
-    setStatusIndicator({ state: "state-done", icon: "OK" });
+    setStatusIndicator({ state: "state-done", icon: "OK", label: currentStatusLabel });
+    nextActionLabel.textContent = nextActionText;
     return;
   }
 
@@ -240,28 +308,35 @@ function render() {
 
   if (waitingForManualStart) {
     const nextStep = timerSteps[currentStepIndex];
-    statusLabel = nextStep ? `Start klaar: ${nextStep.name}` : "Wacht op start";
+    currentStatusLabel = "Klaar om te starten";
     statusIcon = ">";
+    nextActionText = nextStep ? `Tik op start voor ${nextStep.name}` : "Tik op start om verder te gaan";
   } else if (!hasStarted) {
-    statusLabel = "Gereed";
+    currentStatusLabel = "Gereed";
     statusIcon = "OK";
+    nextActionText = "Tik op start om de reeks te beginnen";
   } else if (!running) {
-    statusLabel = "Gepauzeerd";
+    currentStatusLabel = "Gepauzeerd";
     statusIcon = "||";
+    nextActionText = "Hervat of reset deze timer";
   } else {
-    statusLabel = "Loopt";
+    currentStatusLabel = "Loopt";
     statusIcon = ">";
+    nextActionText = nextStep ? `Hierna: ${nextStep.name}` : "Laatste timer van deze reeks";
   }
+
+  nextActionLabel.textContent = nextActionText;
+  progressSlice.style.background = `conic-gradient(from -90deg, var(--ring-color) 0deg ${progressRatio * 360}deg, transparent ${progressRatio * 360}deg 360deg)`;
 
   if (progressRatio <= 0.05) {
     setState("state-alert");
-    setStatusIndicator({ state: "state-alert", icon: "!" });
+    setStatusIndicator({ state: "state-alert", icon: "!", label: "Bijna klaar" });
   } else if (progressRatio <= 0.15) {
     setState("state-warning");
-    setStatusIndicator({ state: "state-warning", icon: "!" });
+    setStatusIndicator({ state: "state-warning", icon: "!", label: "Laatste fase" });
   } else {
     setState("state-normal");
-    setStatusIndicator({ state: "state-normal", icon: statusIcon });
+    setStatusIndicator({ state: "state-normal", icon: statusIcon, label: currentStatusLabel });
   }
 }
 
@@ -369,7 +444,7 @@ form.addEventListener("submit", (event) => {
   try {
     applyStepsFromForm();
   } catch (error) {
-    showStatusError();
+    showStatusError(error.message);
     return;
   }
 
@@ -387,35 +462,8 @@ saveButton.addEventListener("click", () => {
     resetSequence();
     setModalOpen(false);
   } catch (error) {
-    showStatusError();
+    showStatusError(error.message);
   }
-});
-
-pauseButton.addEventListener("click", () => {
-  if (waitingForManualStart) {
-    startCurrentStep();
-    return;
-  }
-
-  if (remainingMs === 0 && currentStepIndex === timerSteps.length - 1) {
-    return;
-  }
-
-  if (running) {
-    stopTimer();
-    render();
-    return;
-  }
-
-  if (!hasStarted) {
-    startCurrentStep();
-    return;
-  }
-
-  deadline = performance.now() + remainingMs;
-  running = true;
-  render();
-  rafId = requestAnimationFrame(tick);
 });
 
 inlineStartButton.addEventListener("click", () => {
@@ -426,11 +474,11 @@ inlinePauseButton.addEventListener("click", () => {
   handlePauseAction();
 });
 
-resetButton.addEventListener("click", () => {
+inlineResetButton.addEventListener("click", () => {
   try {
-    applyStepsFromForm();
+    timerSteps = readStepsFromForm();
   } catch (error) {
-    showStatusError();
+    showStatusError(error.message);
     return;
   }
 
@@ -483,7 +531,16 @@ timerList.addEventListener("change", (event) => {
   syncItemModeVisibility(modeSelect.closest(".timer-item"));
 });
 
+timerList.addEventListener("input", () => {
+  clearFormFeedback();
+});
+
 settingsButton.addEventListener("click", () => {
+  renderList();
+  setModalOpen(true);
+});
+
+editSequenceButton.addEventListener("click", () => {
   renderList();
   setModalOpen(true);
 });
@@ -499,6 +556,25 @@ modalBackdrop.addEventListener("click", () => {
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !settingsModal.hidden) {
     setModalOpen(false);
+    return;
+  }
+
+  if (event.key === "Tab" && !settingsModal.hidden) {
+    const focusable = getFocusableModalElements();
+    if (!focusable.length) {
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   }
 });
 
