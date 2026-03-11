@@ -2,9 +2,10 @@ const form = document.getElementById("timer-form");
 const saveButton = document.getElementById("save-button");
 const addTimerButton = document.getElementById("add-timer-button");
 const inlineStartButton = document.getElementById("inline-start-button");
-const inlinePauseButton = document.getElementById("inline-pause-button");
-const inlineResetButton = document.getElementById("inline-reset-button");
+const inlineSecondaryButton = document.getElementById("inline-secondary-button");
 const inlineStartLabel = document.getElementById("inline-start-label");
+const inlineSecondaryLabel = document.getElementById("inline-secondary-label");
+const inlineSecondaryIcon = document.getElementById("inline-secondary-icon");
 const timerList = document.getElementById("timer-list");
 const timerItemTemplate = document.getElementById("timer-item-template");
 const settingsButton = document.getElementById("settings-button");
@@ -21,7 +22,6 @@ const timerName = document.getElementById("timer-name");
 const activeStepLabel = document.getElementById("active-step-label");
 const nextStepLabel = document.getElementById("next-step-label");
 const sequenceLabel = document.getElementById("sequence-label");
-const nextActionLabel = document.getElementById("next-action-label");
 const timerCard = document.getElementById("timer-card");
 const progressSlice = document.getElementById("progress-slice");
 const formFeedback = document.getElementById("form-feedback");
@@ -285,7 +285,6 @@ function render() {
   const activeStep = timerSteps[currentStepIndex];
   const nextStep = timerSteps[currentStepIndex + 1];
   let currentStatusLabel = "Gereed";
-  let nextActionText = "Open instellingen om je reeks aan te passen";
 
   digitalTime.textContent = timeLabel;
   largeTime.textContent = timeLabel;
@@ -294,38 +293,34 @@ function render() {
   nextStepLabel.textContent = nextStep ? nextStep.name : "Geen";
   sequenceLabel.textContent = `${currentStepIndex + 1} / ${timerSteps.length}`;
   inlineStartLabel.textContent = !hasStarted || safeRemaining === 0 || waitingForManualStart ? "Start" : "Hervat";
+  inlineSecondaryLabel.textContent = running ? "Pauze" : "Reset";
+  inlineSecondaryIcon.textContent = running ? "❚❚" : "↺";
 
   if (safeRemaining === 0 && !running && !waitingForManualStart && hasStarted) {
     currentStatusLabel = "Klaar";
-    nextActionText = nextStep ? `Volgende timer: ${nextStep.name}` : "Je reeks is afgerond";
     setState("state-done");
     setStatusIndicator({ state: "state-done", icon: "OK", label: currentStatusLabel });
-    nextActionLabel.textContent = nextActionText;
+    inlineSecondaryLabel.textContent = "Reset";
+    inlineSecondaryIcon.textContent = "↺";
     return;
   }
 
   let statusIcon = "OK";
 
   if (waitingForManualStart) {
-    const nextStep = timerSteps[currentStepIndex];
     currentStatusLabel = "Klaar om te starten";
     statusIcon = ">";
-    nextActionText = nextStep ? `Tik op start voor ${nextStep.name}` : "Tik op start om verder te gaan";
   } else if (!hasStarted) {
     currentStatusLabel = "Gereed";
     statusIcon = "OK";
-    nextActionText = "Tik op start om de reeks te beginnen";
   } else if (!running) {
     currentStatusLabel = "Gepauzeerd";
     statusIcon = "||";
-    nextActionText = "Hervat of reset deze timer";
   } else {
     currentStatusLabel = "Loopt";
     statusIcon = ">";
-    nextActionText = nextStep ? `Hierna: ${nextStep.name}` : "Laatste timer van deze reeks";
   }
 
-  nextActionLabel.textContent = nextActionText;
   progressSlice.style.background = `conic-gradient(from -90deg, var(--ring-color) 0deg ${progressRatio * 360}deg, transparent ${progressRatio * 360}deg 360deg)`;
 
   if (progressRatio <= 0.05) {
@@ -470,19 +465,12 @@ inlineStartButton.addEventListener("click", () => {
   handleStartAction();
 });
 
-inlinePauseButton.addEventListener("click", () => {
-  handlePauseAction();
-});
-
-inlineResetButton.addEventListener("click", () => {
-  try {
-    timerSteps = readStepsFromForm();
-  } catch (error) {
-    showStatusError(error.message);
+inlineSecondaryButton.addEventListener("click", () => {
+  if (running) {
+    handlePauseAction();
     return;
   }
 
-  renderList();
   resetSequence();
 });
 

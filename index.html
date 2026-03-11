@@ -27,7 +27,6 @@
                   <span id="status-text" class="status-icon" data-icon="OK" aria-hidden="true"></span>
                   <span id="status-label">Gereed</span>
                 </div>
-                <button type="button" id="edit-sequence-button" class="text-button">Bewerk reeks</button>
               </div>
 
               <div id="timer-card" class="timer-card state-normal" aria-live="polite">
@@ -45,7 +44,7 @@
               </div>
 
               <div class="timer-summary">
-                <div class="summary-block summary-block-primary">
+                <div class="summary-block">
                   <span class="overview-label">Actief</span>
                   <strong id="active-step-label">Timer 1</strong>
                 </div>
@@ -59,27 +58,18 @@
                 </div>
               </div>
 
-              <div class="timer-meta timer-meta-bottom">
-                <div class="meta-chip meta-chip-wide">
-                  <span class="overview-label">Volgende actie</span>
-                  <strong id="next-action-label">Open instellingen om je reeks aan te passen</strong>
-                </div>
-              </div>
-
               <div class="timer-actions">
                 <button type="button" id="inline-start-button" class="floating-action primary" aria-label="Start of hervat timer">
                   <span class="action-icon" aria-hidden="true">▶</span>
                   <span id="inline-start-label">Start</span>
                 </button>
-                <button type="button" id="inline-pause-button" class="floating-action" aria-label="Pauzeer timer">
-                  <span class="action-icon" aria-hidden="true">❚❚</span>
-                  <span>Pauze</span>
-                </button>
-                <button type="button" id="inline-reset-button" class="floating-action" aria-label="Reset timer">
-                  <span class="action-icon" aria-hidden="true">↺</span>
-                  <span>Reset</span>
+                <button type="button" id="inline-secondary-button" class="floating-action secondary-action" aria-label="Pauzeer of reset timer">
+                  <span id="inline-secondary-icon" class="action-icon" aria-hidden="true">↺</span>
+                  <span id="inline-secondary-label">Reset</span>
                 </button>
               </div>
+
+              <button type="button" id="edit-sequence-button" class="text-button text-button-centered">Bewerk reeks</button>
             </div>
 
             <span id="digital-time" class="time-value sr-only">05:00</span>
