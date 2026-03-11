@@ -87,16 +87,13 @@ function setState(state) {
   timerCard.className = `timer-card ${state}`;
 }
 
-function setStatusIndicator({ label, state, icon }) {
+function setStatusIndicator({ state, icon }) {
   statusText.dataset.state = state;
   statusText.dataset.icon = icon;
-  statusText.setAttribute("aria-label", label);
-  statusText.title = label;
 }
 
-function showStatusError(message) {
+function showStatusError() {
   setStatusIndicator({
-    label: message,
     state: "state-alert",
     icon: "!"
   });
@@ -235,7 +232,7 @@ function render() {
   if (safeRemaining === 0 && !running && !waitingForManualStart && hasStarted) {
     statusLabel = "Klaar";
     setState("state-done");
-    setStatusIndicator({ label: statusLabel, state: "state-done", icon: "OK" });
+    setStatusIndicator({ state: "state-done", icon: "OK" });
     return;
   }
 
@@ -258,13 +255,13 @@ function render() {
 
   if (progressRatio <= 0.05) {
     setState("state-alert");
-    setStatusIndicator({ label: statusLabel, state: "state-alert", icon: "!" });
+    setStatusIndicator({ state: "state-alert", icon: "!" });
   } else if (progressRatio <= 0.15) {
     setState("state-warning");
-    setStatusIndicator({ label: statusLabel, state: "state-warning", icon: "!" });
+    setStatusIndicator({ state: "state-warning", icon: "!" });
   } else {
     setState("state-normal");
-    setStatusIndicator({ label: statusLabel, state: "state-normal", icon: statusIcon });
+    setStatusIndicator({ state: "state-normal", icon: statusIcon });
   }
 }
 
@@ -372,7 +369,7 @@ form.addEventListener("submit", (event) => {
   try {
     applyStepsFromForm();
   } catch (error) {
-    showStatusError(error.message);
+    showStatusError();
     return;
   }
 
@@ -390,7 +387,7 @@ saveButton.addEventListener("click", () => {
     resetSequence();
     setModalOpen(false);
   } catch (error) {
-    showStatusError(error.message);
+    showStatusError();
   }
 });
 
@@ -433,7 +430,7 @@ resetButton.addEventListener("click", () => {
   try {
     applyStepsFromForm();
   } catch (error) {
-    showStatusError(error.message);
+    showStatusError();
     return;
   }
 
