@@ -1,33 +1,25 @@
 const form = document.getElementById("timer-form");
+const pauseButton = document.getElementById("pause-button");
+const resetButton = document.getElementById("reset-button");
 const saveButton = document.getElementById("save-button");
 const addTimerButton = document.getElementById("add-timer-button");
 const inlineStartButton = document.getElementById("inline-start-button");
-const inlineSecondaryButton = document.getElementById("inline-secondary-button");
 const inlinePauseButton = document.getElementById("inline-pause-button");
-const inlineResetButton = document.getElementById("inline-reset-button");
-const inlineStartLabel = document.getElementById("inline-start-label");
-const inlineSecondaryLabel = document.getElementById("inline-secondary-label");
-const inlineSecondaryIcon = document.getElementById("inline-secondary-icon");
 const timerList = document.getElementById("timer-list");
 const timerItemTemplate = document.getElementById("timer-item-template");
 const settingsButton = document.getElementById("settings-button");
-const editSequenceButton = document.getElementById("edit-sequence-button");
 const closeSettingsButton = document.getElementById("close-settings-button");
 const settingsModal = document.getElementById("settings-modal");
 const modalBackdrop = document.getElementById("modal-backdrop");
 const statusText = document.getElementById("status-text");
-const statusLabel = document.getElementById("status-label");
-const statusBadge = document.getElementById("status-badge");
 const digitalTime = document.getElementById("digital-time");
 const largeTime = document.getElementById("large-time");
 const timerName = document.getElementById("timer-name");
 const activeStepLabel = document.getElementById("active-step-label");
 const nextStepLabel = document.getElementById("next-step-label");
 const sequenceLabel = document.getElementById("sequence-label");
-const nextActionLabel = document.getElementById("next-action-label");
 const timerCard = document.getElementById("timer-card");
 const progressSlice = document.getElementById("progress-slice");
-const formFeedback = document.getElementById("form-feedback");
 
 const DEFAULT_STEPS = [
   {
@@ -49,7 +41,6 @@ let rafId = 0;
 let running = false;
 let hasStarted = false;
 let waitingForManualStart = false;
-let lastFocusedTrigger = null;
 
 function formatTime(totalMs) {
   const totalSeconds = Math.max(0, Math.ceil(totalMs / 1000));
@@ -94,95 +85,11 @@ function normalizeStep(step, index) {
 
 function setState(state) {
   timerCard.className = `timer-card ${state}`;
-  if (statusBadge) {
-    statusBadge.className = `status-badge ${state}`;
-  }
-}
-
-function setStatusIndicator({ state, icon, label }) {
-  statusText.dataset.state = state;
-  statusText.dataset.icon = icon;
-  if (statusLabel) {
-    statusLabel.textContent = label;
-  }
-  if (statusBadge) {
-    statusBadge.className = `status-badge ${state}`;
-    statusBadge.setAttribute("aria-label", label);
-  }
-  if (nextActionLabel) {
-    nextActionLabel.textContent = label;
-  }
-}
-
-function clearFormFeedback() {
-  if (!formFeedback || !timerList) {
-    return;
-  }
-
-  formFeedback.hidden = true;
-  formFeedback.textContent = "";
-  timerList.querySelectorAll(".timer-item").forEach((item) => {
-    item.classList.remove("has-error");
-    const feedback = item.querySelector(".timer-item-feedback");
-    if (feedback) {
-      feedback.hidden = true;
-      feedback.textContent = "";
-    }
-  });
-}
-
-function showFormError(message, index = null) {
-  if (!formFeedback || !timerList) {
-    return;
-  }
-
-  formFeedback.hidden = false;
-  formFeedback.textContent = message;
-
-  if (index === null) {
-    return;
-  }
-
-  const item = timerList.querySelector(`.timer-item[data-index="${index}"]`);
-  if (!item) {
-    return;
-  }
-
-  item.classList.add("has-error");
-  const feedback = item.querySelector(".timer-item-feedback");
-  if (feedback) {
-    feedback.hidden = false;
-    feedback.textContent = message;
-  }
-}
-
-function showStatusError(message = "Controleer je timerinstellingen") {
-  setStatusIndicator({
-    state: "state-alert",
-    icon: "!",
-    label: message
-  });
 }
 
 function setModalOpen(nextOpen) {
-  if (!settingsModal || !settingsButton) {
-    return;
-  }
-
   settingsModal.hidden = !nextOpen;
   settingsButton.setAttribute("aria-expanded", String(nextOpen));
-
-  if (nextOpen) {
-    lastFocusedTrigger = document.activeElement;
-    requestAnimationFrame(() => {
-      const firstFocusable = settingsModal.querySelector("input, select, button");
-      firstFocusable?.focus();
-    });
-    return;
-  }
-
-  clearFormFeedback();
-  lastFocusedTrigger?.focus?.();
 }
 
 function stopTimer() {
@@ -204,14 +111,6 @@ function loadStep(index, resetStarted = false) {
   }
 }
 
-function getFocusableModalElements() {
-  if (!settingsModal) {
-    return [];
-  }
-
-  return [...settingsModal.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled])')];
-}
-
 function syncItemModeVisibility(item) {
   const modeSelect = item.querySelector(".timer-mode-select");
   const durationFields = item.querySelectorAll(".duration-field");
@@ -226,10 +125,6 @@ function syncItemModeVisibility(item) {
 }
 
 function renderList() {
-  if (!timerList || !timerItemTemplate) {
-    return;
-  }
-
   timerList.innerHTML = "";
 
   timerSteps.forEach((step, index) => {
@@ -269,11 +164,6 @@ function renderList() {
 }
 
 function readStepsFromForm() {
-  if (!timerList) {
-    return structuredClone(timerSteps);
-  }
-
-  clearFormFeedback();
   const items = [...timerList.querySelectorAll(".timer-item")];
   const steps = items.map((item, index) => {
     const step = normalizeStep(
@@ -289,21 +179,18 @@ function readStepsFromForm() {
     );
 
     if (getStepDurationMs(step) <= 0) {
-      const message =
+      throw new Error(
         step.mode === "endTime"
           ? `Timer ${index + 1} heeft een geldige eindtijd nodig`
-          : `Timer ${index + 1} moet groter zijn dan 0 seconden`;
-      showFormError(message, index);
-      throw new Error(message);
+          : `Timer ${index + 1} moet groter zijn dan 0 seconden`
+      );
     }
 
     return step;
   });
 
   if (steps.length === 0) {
-    const message = "Voeg minimaal 1 timer toe";
-    showFormError(message);
-    throw new Error(message);
+    throw new Error("Voeg minimaal 1 timer toe");
   }
 
   steps[steps.length - 1].autoStartNext = false;
@@ -315,16 +202,11 @@ function applyStepsFromForm() {
 }
 
 function render() {
-  if (!digitalTime || !largeTime || !timerName || !activeStepLabel || !nextStepLabel || !sequenceLabel || !progressSlice || !timerCard || !statusText) {
-    return;
-  }
-
   const safeRemaining = Math.max(0, remainingMs);
   const timeLabel = formatTime(safeRemaining);
   const progressRatio = totalDurationMs === 0 ? 0 : safeRemaining / totalDurationMs;
   const activeStep = timerSteps[currentStepIndex];
   const nextStep = timerSteps[currentStepIndex + 1];
-  let currentStatusLabel = "Gereed";
 
   digitalTime.textContent = timeLabel;
   largeTime.textContent = timeLabel;
@@ -332,56 +214,31 @@ function render() {
   activeStepLabel.textContent = activeStep ? activeStep.name : "Timer";
   nextStepLabel.textContent = nextStep ? nextStep.name : "Geen";
   sequenceLabel.textContent = `${currentStepIndex + 1} / ${timerSteps.length}`;
-  if (inlineStartLabel) {
-    inlineStartLabel.textContent = !hasStarted || safeRemaining === 0 || waitingForManualStart ? "Start" : "Hervat";
-  }
-  if (inlineSecondaryLabel) {
-    inlineSecondaryLabel.textContent = running ? "Pauze" : "Reset";
-  }
-  if (inlineSecondaryIcon) {
-    inlineSecondaryIcon.textContent = running ? "❚❚" : "↺";
-  }
+  progressSlice.style.background = `conic-gradient(from -90deg, var(--ring-color) 0deg ${progressRatio * 360}deg, transparent ${progressRatio * 360}deg 360deg)`;
 
   if (safeRemaining === 0 && !running && !waitingForManualStart && hasStarted) {
-    currentStatusLabel = "Klaar";
+    statusText.textContent = "Klaar";
     setState("state-done");
-    setStatusIndicator({ state: "state-done", icon: "OK", label: currentStatusLabel });
-    if (inlineSecondaryLabel) {
-      inlineSecondaryLabel.textContent = "Reset";
-    }
-    if (inlineSecondaryIcon) {
-      inlineSecondaryIcon.textContent = "↺";
-    }
     return;
   }
 
-  let statusIcon = "OK";
-
   if (waitingForManualStart) {
-    currentStatusLabel = "Klaar om te starten";
-    statusIcon = ">";
+    const nextStep = timerSteps[currentStepIndex];
+    statusText.textContent = nextStep ? `Start klaar: ${nextStep.name}` : "Wacht op start";
   } else if (!hasStarted) {
-    currentStatusLabel = "Gereed";
-    statusIcon = "OK";
+    statusText.textContent = "Gereed";
   } else if (!running) {
-    currentStatusLabel = "Gepauzeerd";
-    statusIcon = "||";
+    statusText.textContent = "Gepauzeerd";
   } else {
-    currentStatusLabel = "Loopt";
-    statusIcon = ">";
+    statusText.textContent = "Loopt";
   }
-
-  progressSlice.style.background = `conic-gradient(from -90deg, var(--ring-color) 0deg ${progressRatio * 360}deg, transparent ${progressRatio * 360}deg 360deg)`;
 
   if (progressRatio <= 0.05) {
     setState("state-alert");
-    setStatusIndicator({ state: "state-alert", icon: "!", label: "Bijna klaar" });
   } else if (progressRatio <= 0.15) {
     setState("state-warning");
-    setStatusIndicator({ state: "state-warning", icon: "!", label: "Laatste fase" });
   } else {
     setState("state-normal");
-    setStatusIndicator({ state: "state-normal", icon: statusIcon, label: currentStatusLabel });
   }
 }
 
@@ -439,6 +296,7 @@ function tick() {
 function resetSequence() {
   stopTimer();
   loadStep(0, true);
+  statusText.textContent = "Gereed";
   render();
 }
 
@@ -483,168 +341,142 @@ function handlePauseAction() {
   }
 }
 
-if (form) {
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
 
-    try {
-      applyStepsFromForm();
-    } catch (error) {
-      showStatusError(error.message);
-      return;
-    }
-
-    loadStep(waitingForManualStart ? currentStepIndex : 0);
-
-    setModalOpen(false);
-    renderList();
-    startCurrentStep();
-  });
-}
-
-if (saveButton) {
-  saveButton.addEventListener("click", () => {
-    try {
-      applyStepsFromForm();
-      renderList();
-      resetSequence();
-      setModalOpen(false);
-    } catch (error) {
-      showStatusError(error.message);
-    }
-  });
-}
-
-if (inlineStartButton) {
-  inlineStartButton.addEventListener("click", () => {
-    handleStartAction();
-  });
-}
-
-if (inlineSecondaryButton) {
-  inlineSecondaryButton.addEventListener("click", () => {
-    if (running) {
-      handlePauseAction();
-      return;
-    }
-
-    resetSequence();
-  });
-}
-
-if (inlinePauseButton) {
-  inlinePauseButton.addEventListener("click", () => {
-    handlePauseAction();
-  });
-}
-
-if (inlineResetButton) {
-  inlineResetButton.addEventListener("click", () => {
-    resetSequence();
-  });
-}
-
-if (addTimerButton) {
-  addTimerButton.addEventListener("click", () => {
-    try {
-      timerSteps = readStepsFromForm();
-    } catch {
-      timerSteps = timerSteps.length ? timerSteps : structuredClone(DEFAULT_STEPS);
-    }
-
-    addStep();
-  });
-}
-
-if (timerList) {
-  timerList.addEventListener("click", (event) => {
-    const removeButton = event.target.closest(".remove-timer-button");
-
-    if (!removeButton) {
-      return;
-    }
-
-    const item = removeButton.closest(".timer-item");
-    const itemIndex = Number(item.dataset.index);
-
-    if (timerSteps.length <= 1) {
-      return;
-    }
-
-    try {
-      timerSteps = readStepsFromForm();
-    } catch {
-      timerSteps = timerSteps.length ? timerSteps : structuredClone(DEFAULT_STEPS);
-    }
-
-    timerSteps.splice(itemIndex, 1);
-    currentStepIndex = Math.min(currentStepIndex, timerSteps.length - 1);
-    renderList();
-  });
-
-  timerList.addEventListener("change", (event) => {
-    const modeSelect = event.target.closest(".timer-mode-select");
-
-    if (!modeSelect) {
-      return;
-    }
-
-    syncItemModeVisibility(modeSelect.closest(".timer-item"));
-  });
-
-  timerList.addEventListener("input", () => {
-    clearFormFeedback();
-  });
-}
-
-if (settingsButton) {
-  settingsButton.addEventListener("click", () => {
-    renderList();
-    setModalOpen(true);
-  });
-}
-
-if (editSequenceButton) {
-  editSequenceButton.addEventListener("click", () => {
-    renderList();
-    setModalOpen(true);
-  });
-}
-
-if (closeSettingsButton) {
-  closeSettingsButton.addEventListener("click", () => {
-    setModalOpen(false);
-  });
-}
-
-if (modalBackdrop) {
-  modalBackdrop.addEventListener("click", () => {
-    setModalOpen(false);
-  });
-}
-
-document.addEventListener("keydown", (event) => {
-  if (settingsModal && event.key === "Escape" && !settingsModal.hidden) {
-    setModalOpen(false);
+  try {
+    applyStepsFromForm();
+  } catch (error) {
+    statusText.textContent = error.message;
     return;
   }
 
-  if (settingsModal && event.key === "Tab" && !settingsModal.hidden) {
-    const focusable = getFocusableModalElements();
-    if (!focusable.length) {
-      return;
-    }
+  loadStep(waitingForManualStart ? currentStepIndex : 0);
 
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
+  setModalOpen(false);
+  renderList();
+  startCurrentStep();
+});
 
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
+saveButton.addEventListener("click", () => {
+  try {
+    applyStepsFromForm();
+    renderList();
+    resetSequence();
+    setModalOpen(false);
+  } catch (error) {
+    statusText.textContent = error.message;
+  }
+});
+
+pauseButton.addEventListener("click", () => {
+  if (waitingForManualStart) {
+    startCurrentStep();
+    return;
+  }
+
+  if (remainingMs === 0 && currentStepIndex === timerSteps.length - 1) {
+    return;
+  }
+
+  if (running) {
+    stopTimer();
+    render();
+    return;
+  }
+
+  if (!hasStarted) {
+    startCurrentStep();
+    return;
+  }
+
+  deadline = performance.now() + remainingMs;
+  running = true;
+  render();
+  rafId = requestAnimationFrame(tick);
+});
+
+inlineStartButton.addEventListener("click", () => {
+  handleStartAction();
+});
+
+inlinePauseButton.addEventListener("click", () => {
+  handlePauseAction();
+});
+
+resetButton.addEventListener("click", () => {
+  try {
+    applyStepsFromForm();
+  } catch (error) {
+    statusText.textContent = error.message;
+    return;
+  }
+
+  renderList();
+  resetSequence();
+});
+
+addTimerButton.addEventListener("click", () => {
+  try {
+    timerSteps = readStepsFromForm();
+  } catch {
+    timerSteps = timerSteps.length ? timerSteps : structuredClone(DEFAULT_STEPS);
+  }
+
+  addStep();
+});
+
+timerList.addEventListener("click", (event) => {
+  const removeButton = event.target.closest(".remove-timer-button");
+
+  if (!removeButton) {
+    return;
+  }
+
+  const item = removeButton.closest(".timer-item");
+  const itemIndex = Number(item.dataset.index);
+
+  if (timerSteps.length <= 1) {
+    return;
+  }
+
+  try {
+    timerSteps = readStepsFromForm();
+  } catch {
+    timerSteps = timerSteps.length ? timerSteps : structuredClone(DEFAULT_STEPS);
+  }
+
+  timerSteps.splice(itemIndex, 1);
+  currentStepIndex = Math.min(currentStepIndex, timerSteps.length - 1);
+  renderList();
+});
+
+timerList.addEventListener("change", (event) => {
+  const modeSelect = event.target.closest(".timer-mode-select");
+
+  if (!modeSelect) {
+    return;
+  }
+
+  syncItemModeVisibility(modeSelect.closest(".timer-item"));
+});
+
+settingsButton.addEventListener("click", () => {
+  renderList();
+  setModalOpen(true);
+});
+
+closeSettingsButton.addEventListener("click", () => {
+  setModalOpen(false);
+});
+
+modalBackdrop.addEventListener("click", () => {
+  setModalOpen(false);
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !settingsModal.hidden) {
+    setModalOpen(false);
   }
 });
 
