@@ -27,16 +27,16 @@
 
         <main class="widget-main">
           <section class="panel timer-panel">
-            <div class="timer-overview">
-              <div class="overview-pill">
+            <div class="overview-compact">
+              <div class="overview-row">
                 <span class="overview-label">Actief</span>
                 <strong id="active-step-label">Timer 1</strong>
               </div>
-              <div class="overview-pill overview-pill-muted">
+              <div class="overview-row">
                 <span class="overview-label">Volgende</span>
                 <strong id="next-step-label">Geen</strong>
               </div>
-              <div class="overview-pill overview-pill-muted overview-pill-wide">
+              <div class="sequence-chip">
                 <span class="overview-label">Reeks</span>
                 <strong id="sequence-label">1 / 1</strong>
               </div>
@@ -63,12 +63,12 @@
             </div>
 
             <dl class="status-grid">
-              <div>
-                <dt>Status</dt>
+              <div class="status-card">
+                <dt class="status-caption">Status</dt>
                 <dd id="status-text" class="status-value">Gereed</dd>
               </div>
-              <div>
-                <dt>Resterend</dt>
+              <div class="status-card">
+                <dt class="status-caption">Resterend</dt>
                 <dd id="digital-time" class="time-value">05:00</dd>
               </div>
             </dl>
