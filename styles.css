@@ -16,7 +16,7 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --viewport-min: min(100dvw, 100dvh);
-  --widget-width: clamp(220px, calc(var(--viewport-min) * 0.76), 360px);
+  --widget-width: clamp(440px, calc(var(--viewport-min) * 0.96), 720px);
   --space-1: clamp(5px, calc(var(--widget-width) * 0.025), 8px);
   --space-2: clamp(7px, calc(var(--widget-width) * 0.038), 10px);
   --space-3: clamp(8px, calc(var(--widget-width) * 0.05), 12px);
@@ -306,7 +306,7 @@ dd {
   padding: var(--space-2);
   display: grid;
   gap: 0;
-  width: var(--widget-width);
+  width: 100%;
   aspect-ratio: 1;
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.94), transparent 40%),
@@ -352,10 +352,11 @@ dd {
 
 .timer-face {
   position: relative;
-  width: var(--timer-size);
-  height: var(--timer-size);
+  width: min(var(--timer-size), 100%);
+  height: min(var(--timer-size), 100%);
   aspect-ratio: 1;
   border-radius: 50%;
+  overflow: hidden;
   display: grid;
   place-items: center;
   background:
@@ -599,7 +600,7 @@ dd {
 
 @media (max-width: 360px), (max-height: 520px) {
   :root {
-    --widget-width: min(100%, clamp(220px, calc(var(--viewport-min) * 0.88), 300px));
+    --widget-width: min(100%, clamp(300px, calc(var(--viewport-min) * 0.96), 420px));
     --timer-size: calc(var(--widget-width) - (var(--space-2) * 2));
   }
 }
