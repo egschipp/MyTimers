@@ -16,15 +16,6 @@
   <body>
     <div class="app-shell">
       <div class="widget-shell">
-        <header class="site-bar">
-          <div class="site-bar-inner">
-            <span class="brand">MyTimers</span>
-            <button type="button" id="settings-button" class="icon-button icon-only" aria-haspopup="dialog" aria-controls="settings-modal" aria-expanded="false" aria-label="Instellingen">
-              ⚙
-            </button>
-          </div>
-        </header>
-
         <main class="widget-main">
           <section class="panel timer-panel">
             <div class="overview-compact">
@@ -43,11 +34,16 @@
             </div>
 
             <div class="timer-stage">
+              <button type="button" id="settings-button" class="icon-button icon-only timer-settings-button" aria-haspopup="dialog" aria-controls="settings-modal" aria-expanded="false" aria-label="Instellingen">
+                ⚙
+              </button>
+
               <div id="timer-card" class="timer-card state-normal" aria-live="polite">
                 <div class="timer-face">
                   <div class="face-rings"></div>
                   <div class="markers" aria-hidden="true"></div>
                   <div id="progress-slice" class="progress-slice"></div>
+                  <img class="timer-logo" src="assets/initials-logo.png" alt="" aria-hidden="true" />
                   <div class="pivot"></div>
                   <div class="center-readout">
                     <span id="timer-name" class="timer-name">Timer 1</span>
@@ -62,16 +58,11 @@
               </div>
             </div>
 
-            <dl class="status-grid">
-              <div class="status-card">
-                <dt class="status-caption">Status</dt>
-                <dd id="status-text" class="status-value">Gereed</dd>
-              </div>
-              <div class="status-card">
-                <dt class="status-caption">Resterend</dt>
-                <dd id="digital-time" class="time-value">05:00</dd>
-              </div>
-            </dl>
+            <div class="status-strip" aria-live="polite">
+              <span id="status-text" class="status-icon status-value">Gereed</span>
+            </div>
+
+            <span id="digital-time" class="time-value sr-only">05:00</span>
           </section>
         </main>
       </div>
