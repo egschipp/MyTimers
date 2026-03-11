@@ -85,6 +85,7 @@ function normalizeStep(step, index) {
 
 function setState(state) {
   timerCard.className = `timer-card ${state}`;
+  statusText.dataset.state = state;
 }
 
 function setModalOpen(nextOpen) {

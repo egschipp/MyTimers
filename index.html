@@ -22,6 +22,7 @@
               <button type="button" id="settings-button" class="icon-button icon-only timer-settings-button" aria-haspopup="dialog" aria-controls="settings-modal" aria-expanded="false" aria-label="Instellingen">
                 ⚙
               </button>
+              <span id="status-text" class="status-icon timer-status-indicator" aria-label="Gereed" title="Gereed"></span>
 
               <div class="timer-meta timer-meta-top">
                 <div class="meta-chip">
@@ -59,10 +60,6 @@
                 <button type="button" id="inline-start-button" class="floating-action primary" aria-label="Start timer">▶</button>
                 <button type="button" id="inline-pause-button" class="floating-action" aria-label="Pauzeer timer">❚❚</button>
               </div>
-            </div>
-
-            <div class="status-strip" aria-live="polite">
-              <span id="status-text" class="status-icon" aria-label="Gereed" title="Gereed"></span>
             </div>
 
             <span id="digital-time" class="time-value sr-only">05:00</span>

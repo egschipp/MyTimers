@@ -303,13 +303,6 @@ button.primary {
   border-color: transparent;
 }
 
-.status-strip {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 16px;
-}
-
 dd {
   margin: 2px 0 0;
   font-size: var(--font-md);
@@ -323,10 +316,38 @@ dd {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--ring-color, var(--accent));
+  background: var(--accent);
   box-shadow:
-    0 0 0 4px color-mix(in srgb, var(--ring-color, var(--accent)) 14%, transparent),
-    0 1px 6px color-mix(in srgb, var(--ring-color, var(--accent)) 30%, transparent);
+    0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent),
+    0 1px 6px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.timer-status-indicator {
+  position: absolute;
+  top: 11px;
+  left: 11px;
+  z-index: 1;
+}
+
+.status-icon[data-state="state-warning"] {
+  background: var(--warning);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--warning) 14%, transparent),
+    0 1px 6px color-mix(in srgb, var(--warning) 30%, transparent);
+}
+
+.status-icon[data-state="state-alert"] {
+  background: var(--alert);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--alert) 14%, transparent),
+    0 1px 6px color-mix(in srgb, var(--alert) 30%, transparent);
+}
+
+.status-icon[data-state="state-done"] {
+  background: var(--done);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--done) 14%, transparent),
+    0 1px 6px color-mix(in srgb, var(--done) 30%, transparent);
 }
 
 .time-value {
